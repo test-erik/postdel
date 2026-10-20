@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"os/user"
 	"strings"
-
+    "encoding/json"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/bubbles/viewport"
 	"github.com/charmbracelet/lipgloss"
@@ -72,12 +72,33 @@ var (
 
 // Run mailq, parse IDs.
 func runMailqCmd() tea.Msg {
-	out, err := exec.Command("mailq").Output()
-	if err != nil {
-		return errorMsg(err)
-	}
-	ids := parseMailqForIDs(out)
-	return mailqIDsMsg(ids)
+    out, err := exec.Command("postqueue", "-j").Output()
+    if err != nil {
+        return errorMsg(err)
+    }
+
+    var ids []string
+    scanner := bufio.NewScanner(bytes.NewReader(out))
+
+    for scanner.Scan() {
+        var entry struct {
+            QueueID string `json:"queue_id"`
+        }
+
+        if err := json.Unmarshal(scanner.Bytes(), &entry); err != nil {
+            return errorMsg(err)
+        }
+
+        if entry.QueueID != "" {
+            ids = append(ids, entry.QueueID)
+        }
+    }
+
+    if err := scanner.Err(); err != nil {
+        return errorMsg(err)
+    }
+
+    return mailqIDsMsg(ids)
 }
 
 // Run postcat -q <ID>.
