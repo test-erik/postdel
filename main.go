@@ -172,27 +172,28 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case mailqIDsMsg:
-		// Neue Liste von IDs
-		m.entries = msg
+    m.entries = msg
 
-		// Wieder an den Anfang
-		m.selected = 0
-		m.syncLeft()
+    if len(m.entries) == 0 {
+        m.selected = 0
+        m.syncLeft()
 
-		// Wenn wir NICHT gerade frisch gelöscht haben,
-		// laden wir automatisch die erste ID
-		if !m.justDeleted {
-			if len(m.entries) > 0 {
-				m.rightRaw = "Loading details…"
-				m.right.SetContent(m.rightRaw)
-				return m, runPostcatCmd(m.entries[m.selected])
-			}
-		} else {
-			// War ein frischer Löschvorgang
-			// => Kein automatisches "postcat" mehr
-			m.justDeleted = false
-		}
-		return m, nil
+        m.rightRaw = "Queue is empty."
+        m.right.SetContent(m.rightRaw)
+
+        return m, nil
+    }
+
+    if m.selected >= len(m.entries) {
+        m.selected = len(m.entries) - 1
+    }
+
+    m.syncLeft()
+
+    m.rightRaw = "Loading details..."
+    m.right.SetContent(m.rightRaw)
+
+    return m, runPostcatCmd(m.entries[m.selected])
 
 	case postcatMsg:
 		m.rightRaw = string(msg)
