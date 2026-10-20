@@ -367,7 +367,17 @@ func (m *model) syncLeft() {
 	m.leftRaw = sb.String()
 	m.left.SetContent(m.leftRaw)
 }
+func (m *model) resizeMain() {
+    m.ready = true
 
+    m.left.Width = 14
+    m.left.Height = maxInt(1, m.termHeight-5)
+
+    m.right.Width = maxInt(1, m.termWidth-22)
+    m.right.Height = m.left.Height
+
+    m.syncLeft()
+}
 // scrollHalfUp / scrollHalfDown => halbe Seite scrollen, oder Jump to Top/Bottom
 func scrollHalfUp(v *viewport.Model, rawText string) {
 	half := v.Height / 2
