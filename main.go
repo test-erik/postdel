@@ -212,8 +212,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     m.right.GotoTop()
 
     return m, nil
-
-    return m, nil
 		m.rightRaw = string(msg)
 		m.right.SetContent(m.rightRaw)
 		m.right.GotoBottom()
