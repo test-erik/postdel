@@ -112,37 +112,6 @@ func runPostcatCmd(queueID string) tea.Cmd {
 	}
 }
 
-// parseMailqForIDs scans mailq output for something that looks like a queue ID.
-func parseMailqForIDs(output []byte) []string {
-	scanner := bufio.NewScanner(bytes.NewReader(output))
-	var ids []string
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if line == "" {
-			continue
-		}
-		fields := strings.Fields(line)
-		if len(fields) > 0 && looksLikeQueueID(fields[0]) {
-			ids = append(ids, fields[0])
-		}
-	}
-	return ids
-}
-
-// Simplistic check for a Postfix-like queue ID.
-func looksLikeQueueID(s string) bool {
-	if len(s) < 3 || len(s) > 20 {
-		return false
-	}
-	for _, r := range s {
-		if (r < '0' || r > '9') &&
-			(r < 'A' || r > 'Z') &&
-			(r < 'a' || r > 'z') {
-			return false
-		}
-	}
-	return true
-}
 
 // Der eigentliche Löschbefehl. Anschließend refresh per mailq.
 func (m *model) deleteQueueID() tea.Cmd {
