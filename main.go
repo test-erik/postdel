@@ -226,15 +226,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "tab":
 			m.focus = 1 - m.focus
 			return m, nil
-		case "d":
-			m.showDeleteDialog = true
-			return m, nil
-		}
+case "d":
+    if len(m.entries) > 0 {
+        m.showDeleteDialog = true
+    }
+    return m, nil
 
-		// 3) Ggf. Warnfenster wegklicken
-		if m.showWarning {
-			m.showWarning = false
-			return m, runMailqCmd
+case "r":
+    return m, runMailqCmd
 		}
 
 		// 4) Navigation je nach Fokus
@@ -305,7 +304,7 @@ func (m model) View() string {
 	background := lipgloss.Place(
 		m.termWidth, m.termHeight,
 		lipgloss.Left, lipgloss.Top,
-		mainLayout+"\n[TAB] to switch focus, 'd' to delete, 'q' to quit.",
+		mainLayout+"\n[TAB] focus, 'd' delete, 'r' refresh, 'q' quit.",
 	)
 
 	if !m.showDeleteDialog {
