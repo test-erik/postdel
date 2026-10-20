@@ -46,9 +46,6 @@ type model struct {
 	showDeleteDialog bool
 	termWidth        int
 	termHeight       int
-
-	// Flag, ob wir gerade frisch gelöscht haben
-	justDeleted bool
 }
 
 // Styling
