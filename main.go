@@ -318,16 +318,23 @@ func (m model) View() string {
 	)
 
 	if !m.showDeleteDialog {
-		return background
-	}
+    return background
+}
 
-	// "really delete?" overlay
-	dialogBox := dialogBoxStyle.Render("really delete [y/N]?")
-	foreground := lipgloss.Place(
-		m.termWidth, m.termHeight,
-		lipgloss.Center, lipgloss.Center,
-		dialogBox,
-	)
+id := ""
+if m.selected < len(m.entries) {
+    id = m.entries[m.selected]
+}
+
+dialogBox := dialogBoxStyle.Render(
+    fmt.Sprintf("Delete %s?\n[y/N]", id),
+)
+
+return lipgloss.Place(
+    m.termWidth, m.termHeight,
+    lipgloss.Center, lipgloss.Center,
+    dialogBox,
+)
 
 	return overlayStrings(background, foreground)
 }
@@ -388,49 +395,6 @@ func scrollHalfDown(v *viewport.Model, rawText string) {
 	} else {
 		v.LineDown(half)
 	}
-}
-
-// Overlay-Tools
-func overlayStrings(bg, fg string) string {
-	bgLines := strings.Split(bg, "\n")
-	fgLines := strings.Split(fg, "\n")
-
-	maxH := maxInt(len(bgLines), len(fgLines))
-	if len(bgLines) < maxH {
-		bgLines = append(bgLines, make([]string, maxH-len(bgLines))...)
-	}
-	if len(fgLines) < maxH {
-		fgLines = append(fgLines, make([]string, maxH-len(fgLines))...)
-	}
-
-	var merged []string
-	for i := 0; i < maxH; i++ {
-		merged = append(merged, overlayLine(bgLines[i], fgLines[i]))
-	}
-	return strings.Join(merged, "\n")
-}
-
-func overlayLine(bgLine, fgLine string) string {
-	w := maxInt(len(bgLine), len(fgLine))
-	bgLine = padTo(bgLine, w)
-	fgLine = padTo(fgLine, w)
-
-	var sb strings.Builder
-	for i := 0; i < w; i++ {
-		if fgLine[i] == ' ' {
-			sb.WriteByte(bgLine[i])
-		} else {
-			sb.WriteByte(fgLine[i])
-		}
-	}
-	return sb.String()
-}
-
-func padTo(s string, w int) string {
-	if len(s) >= w {
-		return s
-	}
-	return s + strings.Repeat(" ", w-len(s))
 }
 
 func maxInt(a, b int) int {
