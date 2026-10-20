@@ -127,7 +127,6 @@ func (m *model) deleteQueueID() tea.Cmd {
 	}
 
 	// Markieren, dass wir gerade gelöscht haben
-	m.justDeleted = true
 	return runMailqCmd
 }
 
