@@ -161,17 +161,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 
-		m.ready = true
-		leftWidth := 14
-		rightWidth := m.termWidth - leftWidth - 8
-
-		m.left.Width = leftWidth
-		m.left.Height = m.termHeight - 5
-		m.right.Width = rightWidth
-		m.right.Height = m.termHeight - 5
-
-		m.syncLeft()
-		return m, nil
+	m.resizeMain()
+	return m, nil
 
 	case mailqIDsMsg:
     m.entries = msg
