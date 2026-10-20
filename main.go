@@ -18,7 +18,10 @@ import (
 type mailqIDsMsg []string
 
 // postcatMsg is the output of "postcat -q <ID>".
-type postcatMsg string
+type postcatMsg struct {
+    queueID string
+    content string
+}
 
 // errorMsg represents any error running external commands.
 type errorMsg error
@@ -103,15 +106,18 @@ func runMailqCmd() tea.Msg {
 
 // Run postcat -q <ID>.
 func runPostcatCmd(queueID string) tea.Cmd {
-	return func() tea.Msg {
-		out, err := exec.Command("/usr/sbin/postcat", "-q", queueID).Output()
-		if err != nil {
-			return errorMsg(err)
-		}
-		return postcatMsg(out)
-	}
-}
+    return func() tea.Msg {
+        out, err := exec.Command("/usr/sbin/postcat", "-q", queueID).Output()
+        if err != nil {
+            return errorMsg(err)
+        }
 
+        return postcatMsg{
+            queueID: queueID,
+            content: string(out),
+        }
+    }
+}
 
 // Der eigentliche Löschbefehl. Anschließend refresh per mailq.
 func (m *model) deleteQueueID() tea.Cmd {
@@ -194,7 +200,20 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
     return m, runPostcatCmd(m.entries[m.selected])
 
-	case postcatMsg:
+
+    case postcatMsg:
+    if m.selected >= len(m.entries) ||
+        m.entries[m.selected] != msg.queueID {
+        return m, nil
+    }
+
+    m.rightRaw = msg.content
+    m.right.SetContent(m.rightRaw)
+    m.right.GotoTop()
+
+    return m, nil
+
+    return m, nil
 		m.rightRaw = string(msg)
 		m.right.SetContent(m.rightRaw)
 		m.right.GotoBottom()
