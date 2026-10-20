@@ -336,7 +336,6 @@ return lipgloss.Place(
     dialogBox,
 )
 
-	return overlayStrings(background, foreground)
 }
 
 // syncWarningViewport sets the text for the initial root/postfix warning.
