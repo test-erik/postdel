@@ -205,6 +205,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case tea.KeyMsg:
+    if m.showWarning {
+        switch msg.String() {
+        case "q", "esc", "ctrl+c":
+            return m, tea.Quit
+        default:
+            m.showWarning = false
+            m.resizeMain()
+            return m, runMailqCmd
+        }
+    }
 		// 1) Dialog "really delete?"
 		if m.showDeleteDialog {
 			switch strings.ToLower(msg.String()) {
