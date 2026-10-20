@@ -200,7 +200,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
     return m, runPostcatCmd(m.entries[m.selected])
 
-
     case postcatMsg:
     if m.selected >= len(m.entries) ||
         m.entries[m.selected] != msg.queueID {
@@ -212,11 +211,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     m.right.GotoTop()
 
     return m, nil
-		m.rightRaw = string(msg)
-		m.right.SetContent(m.rightRaw)
-		m.right.GotoBottom()
-		return m, nil
-
+		
 	case errorMsg:
 		m.err = msg
 		return m, nil
